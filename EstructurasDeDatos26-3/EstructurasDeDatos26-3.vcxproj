@@ -124,6 +124,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EstructurasDeDatos26-3.cpp" />
+    <ClCompile Include="Nodo.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Nodo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -5,6 +5,7 @@ template <class T>
 class Stack
 {
 private:
+    
     int _size;
     TNode<T>* _bottom;
     TNode<T>* _top;
@@ -47,6 +48,32 @@ void Stack<T>::Push(TNode<T>* n)
         n->setId(0);
     }
     
+}
+
+template <class T>
+void Stack<T>::Push(T value)
+{
+    //Stack ya trae algo
+    if (_bottom != nullptr)
+    {
+        TNode<T>* Nodo = new TNode<T>(value, 0);
+        TNode<T>* temp = _bottom;
+        while (temp->getNext() != nullptr)
+        {
+            temp = temp->getNext();
+        }
+        temp->setNext(Nodo);
+        (temp->getNext())->setId(temp->getId() + 1); //Tnode del next ponle el id de el actual +1 
+        _size++;
+    }
+    else //Stack Vacío
+    {
+        TNode<T>* Nodo = new TNode<T>(value,0);
+        _bottom = Nodo;
+        _size = 1;
+        Nodo->setId(0);
+    }
+
 }
 
 template <class T>

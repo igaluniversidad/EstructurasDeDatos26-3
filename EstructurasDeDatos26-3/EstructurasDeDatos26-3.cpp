@@ -3,11 +3,16 @@
 
 #include <iostream>
 #include <cstdlib>
-#include "Nodo.h"
+#include "TNode.h"
+#include "Stack.h"
 
 int main()
 {
-	
+	Stack<int> s;
+	s.Push(30);
+	s.Push(16);
+	s.Push(46);
+	s.Push(890);
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

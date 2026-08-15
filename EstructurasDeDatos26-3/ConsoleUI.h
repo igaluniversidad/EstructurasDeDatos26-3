@@ -4,7 +4,7 @@
 class ConsoleUI
 {
 public:
-    // Códigos ANSI definidos como constantes para evitar hardcodearlos por todo el código
+  
     static const int COLOR_RESET = 0;
     static const int COLOR_RED = 31;
     static const int COLOR_GREEN = 32;

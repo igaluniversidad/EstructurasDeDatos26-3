@@ -1,33 +1,36 @@
-// EstructurasDeDatos26-3.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <iostream>
 #include <cstdlib>
 #include <ctime>  
+#include <thread>
+#include <chrono>
 #include "LinkedList.h"
 #include "ConsoleUI.h"
 #include "Nodo.h"
 
 int main()
 {
-    srand(time(NULL)); // Semilla para números aleatorios
+    srand(time(NULL));
 
     LinkedList listaSelection;
     LinkedList listaInsertion;
 
-    // Llenamos ambas listas con los mismos valores aleatorios para poder comparar
-    for (int i = 0; i < 5; i++) {
-        int randomValue = rand() % 100;
-        listaSelection.Add(randomValue);
-        listaInsertion.Add(randomValue);
-    }
-
     ConsoleUI::ClearScreen();
     ConsoleUI::PrintTitle("Prueba de Ordenamientos");
 
-    // ==========================================
-    // PRUEBA 1: SELECTION SORT
-    // ==========================================
+    ConsoleUI::PrintColor("Generando datos aleatorios...", ConsoleUI::COLOR_CYAN);
+
+    int elementos = 5;
+    for (int i = 1; i <= elementos; i++) {
+        int randomValue = rand() % 100;
+        listaSelection.Add(randomValue);
+        listaInsertion.Add(randomValue);
+
+        ConsoleUI::PrintProgressBar(i, elementos);
+        std::this_thread::sleep_for(std::chrono::milliseconds(150));
+    }
+
+    ConsoleUI::PrintSeparator();
+
     ConsoleUI::PrintColor("Lista Original (Desordenada):", ConsoleUI::COLOR_YELLOW);
     listaSelection.Print();
     ConsoleUI::PrintSeparator();
@@ -39,9 +42,6 @@ int main()
     listaSelection.Print();
     ConsoleUI::PrintSeparator();
 
-    // ==========================================
-    // PRUEBA 2: INSERTION SORT
-    // ==========================================
     ConsoleUI::PrintColor("Ordenando con Insertion Sort la misma lista...", ConsoleUI::COLOR_CYAN);
     listaInsertion.InsertionSort();
 
@@ -51,14 +51,3 @@ int main()
     ConsoleUI::Pause();
     return 0;
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file

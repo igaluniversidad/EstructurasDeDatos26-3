@@ -3,11 +3,53 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <ctime>  
+#include "LinkedList.h"
+#include "ConsoleUI.h"
 #include "Nodo.h"
 
 int main()
 {
-	
+    srand(time(NULL)); // Semilla para números aleatorios
+
+    LinkedList listaSelection;
+    LinkedList listaInsertion;
+
+    // Llenamos ambas listas con los mismos valores aleatorios para poder comparar
+    for (int i = 0; i < 5; i++) {
+        int randomValue = rand() % 100;
+        listaSelection.Add(randomValue);
+        listaInsertion.Add(randomValue);
+    }
+
+    ConsoleUI::ClearScreen();
+    ConsoleUI::PrintTitle("Prueba de Ordenamientos");
+
+    // ==========================================
+    // PRUEBA 1: SELECTION SORT
+    // ==========================================
+    ConsoleUI::PrintColor("Lista Original (Desordenada):", ConsoleUI::COLOR_YELLOW);
+    listaSelection.Print();
+    ConsoleUI::PrintSeparator();
+
+    ConsoleUI::PrintColor("Ordenando con Selection Sort...", ConsoleUI::COLOR_CYAN);
+    listaSelection.SelectionSort();
+
+    ConsoleUI::PrintSuccess("Lista Ordenada Correctamente (Selection):");
+    listaSelection.Print();
+    ConsoleUI::PrintSeparator();
+
+    // ==========================================
+    // PRUEBA 2: INSERTION SORT
+    // ==========================================
+    ConsoleUI::PrintColor("Ordenando con Insertion Sort la misma lista...", ConsoleUI::COLOR_CYAN);
+    listaInsertion.InsertionSort();
+
+    ConsoleUI::PrintSuccess("Lista Ordenada Correctamente (Insertion):");
+    listaInsertion.Print();
+
+    ConsoleUI::Pause();
+    return 0;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

@@ -123,11 +123,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="EstructurasDeDatos26-3.cpp" />
     <ClCompile Include="LinkedList.cpp" />
     <ClCompile Include="Nodo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConsoleUI.h" />
     <ClInclude Include="LinkedList.h" />
     <ClInclude Include="Nodo.h" />
   </ItemGroup>

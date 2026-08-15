@@ -1,17 +1,19 @@
 #pragma once
+#include "Nodo.h"
 class LinkedList
 {
-private:
-	int _size;
-
 public:
-	LinkedList();
-	void Add(int dato);
-	int GetAt(int index);
-	int GetSize();
-	void Print();
-	void InsertionSort();
-	void SelectionSort();
-	~LinkedList();
-};
+    LinkedList();
+    ~LinkedList();
+    void Add(int dato);
+    int GetAt(int index);
+    int GetSize();
+    void Print();
+    void SelectionSort();
+    void InsertionSort();
 
+private:
+    Nodo* _first;
+    Nodo* _last;  
+    int _size;    
+};

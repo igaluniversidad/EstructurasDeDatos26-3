@@ -9,6 +9,7 @@ private:
     int _id;
     
 public:
+    static int contadorVivos;
     void setDato(T d);
     T getDato();
 
@@ -21,6 +22,7 @@ public:
     TNode();
     TNode(T dato, int id);
     TNode(T dato, TNode* nodo, int id);
+    ~TNode();
 };
 
 template <class T>
@@ -62,7 +64,8 @@ TNode<T>* TNode<T>::getNext()
 template <class T>
 TNode<T>::TNode()
 {
-    _dato = nullptr;
+    contadorVivos++;
+    _dato = T();
     _next = nullptr;
     _id = 0;
 }
@@ -70,6 +73,7 @@ TNode<T>::TNode()
 template <class T>
 TNode<T>::TNode(T dato, TNode* nodo, int id)
 {
+    contadorVivos++;
     _dato = dato;
     _next = nodo;
     _id = id;
@@ -78,7 +82,16 @@ TNode<T>::TNode(T dato, TNode* nodo, int id)
 template <class T>
 TNode<T>::TNode(T dato, int id)
 {
+    contadorVivos++;
     _dato = dato;
     _id = id;
     _next = nullptr;
 }
+
+template <class T>
+TNode<T>::~TNode()
+{
+    contadorVivos--;
+}
+
+template <class T> int TNode<T>::contadorVivos = 0;

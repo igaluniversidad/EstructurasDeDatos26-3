@@ -123,15 +123,24 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="ConsoleUI.cpp" />
     <ClCompile Include="EstructurasDeDatos26-3.cpp" />
     <ClCompile Include="Nodo.cpp" />
     <ClCompile Include="Stack.cpp" />
+    <ClCompile Include="Tests.cpp" />
     <ClCompile Include="TNode.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ConsoleUI.h" />
+    <ClInclude Include="doctest.h" />
+    <ClInclude Include="Grid.h" />
+    <ClInclude Include="LinkedList.h" />
+    <ClInclude Include="LinkedQueue.h" />
     <ClInclude Include="Nodo.h" />
     <ClInclude Include="Stack.h" />
+    <ClInclude Include="Tests.h" />
     <ClInclude Include="TNode.h" />
+    <ClInclude Include="TwoStackQueue.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

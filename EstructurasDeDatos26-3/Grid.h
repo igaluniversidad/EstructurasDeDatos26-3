@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include "ConsoleUI.h"
 
 // =====================================================================
 //  Grid<T>  -  Rejilla generica (arreglo 2D dinamico encapsulado)
@@ -47,36 +48,64 @@ public:
 template <class T>
 Grid<T>::Grid(int filas, int columnas)
 {
-    // Los punteros arrancan en nullptr para que nada truene antes de
-    // que reserves la memoria. NO borres estas dos lineas.
     _celdas = nullptr;
     _visitadas = nullptr;
     _filas = filas;
     _columnas = columnas;
 
-    // TODO: reservar la memoria de _celdas y _visitadas.
-    // Acuerdate: primero un arreglo de punteros, y luego dentro de un
-    // ciclo, un arreglo por cada renglon.
+    _celdas = new T*[_filas];
+    _visitadas = new bool*[_filas];
+    for (int i = 0; i < _filas; ++i)
+    {
+        _celdas[i] = new T[_columnas];
+        _visitadas[i] = new bool[_columnas];
+        for (int j = 0; j < _columnas; ++j)
+        {
+            _celdas[i][j] = T();
+            _visitadas[i][j] = false;
+        }
+    }
 }
 
 template <class T>
 Grid<T>::~Grid()
 {
-    // TODO: liberar en el orden INVERSO al que reservaste:
-    //       primero cada renglon, y al final el arreglo de punteros.
+    if (_celdas != nullptr)
+    {
+        for (int i = 0; i < _filas; ++i)
+            delete[] _celdas[i];
+        delete[] _celdas;
+        _celdas = nullptr;
+    }
+    if (_visitadas != nullptr)
+    {
+        for (int i = 0; i < _filas; ++i)
+            delete[] _visitadas[i];
+        delete[] _visitadas;
+        _visitadas = nullptr;
+    }
 }
 
 template <class T>
 void Grid<T>::Set(int fila, int columna, T valor)
 {
-    // TODO: validar que la coordenada exista antes de escribir
+    if (fila < 0 || fila >= _filas || columna < 0 || columna >= _columnas)
+    {
+        ConsoleUI::PrintError("Grid::Set: coordenada fuera de rango");
+        return;
+    }
+    _celdas[fila][columna] = valor;
 }
 
 template <class T>
 T Grid<T>::Get(int fila, int columna)
 {
-    // TODO: validar que la coordenada exista antes de leer
-    return T();
+    if (fila < 0 || fila >= _filas || columna < 0 || columna >= _columnas)
+    {
+        ConsoleUI::PrintError("Grid::Get: coordenada fuera de rango");
+        return T();
+    }
+    return _celdas[fila][columna];
 }
 
 template <class T>
@@ -94,24 +123,53 @@ int Grid<T>::GetColumnas()
 template <class T>
 int Grid<T>::FloodFill(int fila, int columna)
 {
-    // TODO: 1) validar la coordenada
-    //       2) REINICIAR todas las celdas visitadas a false
-    //          (si no lo haces, la segunda vez que corras FloodFill
-    //           te va a regresar 0)
-    //       3) llamar a FloodRecursivo con el valor de esa celda
-    return 0;
+    if (fila < 0 || fila >= _filas || columna < 0 || columna >= _columnas)
+    {
+        ConsoleUI::PrintError("Grid::FloodFill: coordenada fuera de rango");
+        return 0;
+    }
+    for (int i = 0; i < _filas; ++i)
+        for (int j = 0; j < _columnas; ++j)
+            _visitadas[i][j] = false;
+
+    T objetivo = _celdas[fila][columna];
+    return FloodRecursivo(fila, columna, objetivo);
 }
 
 template <class T>
 int Grid<T>::FloodRecursivo(int fila, int columna, T objetivo)
 {
-    // TODO: tres casos base, luego marcar como visitada,
-    //       y sumar 1 + las cuatro llamadas recursivas
-    return 0;
+    if (fila < 0 || fila >= _filas || columna < 0 || columna >= _columnas)
+        return 0;
+    if (_visitadas[fila][columna])
+        return 0;
+    if (_celdas[fila][columna] != objetivo)
+        return 0;
+
+    _visitadas[fila][columna] = true;
+
+    int count = 1;
+    count += FloodRecursivo(fila + 1, columna, objetivo);
+    count += FloodRecursivo(fila - 1, columna, objetivo);
+    count += FloodRecursivo(fila, columna + 1, objetivo);
+    count += FloodRecursivo(fila, columna - 1, objetivo);
+    return count;
 }
 
 template <class T>
 void Grid<T>::Print()
 {
-    // TODO: imprimir la rejilla en formato tabular
+    std::cout << "    ";
+    for (int c = 0; c < _columnas; ++c)
+        std::cout << c << "\t";
+    std::cout << std::endl;
+    for (int f = 0; f < _filas; ++f)
+    {
+        std::cout << f << " | ";
+        for (int c = 0; c < _columnas; ++c)
+        {
+            std::cout << _celdas[f][c] << "\t";
+        }
+        std::cout << std::endl;
+    }
 }

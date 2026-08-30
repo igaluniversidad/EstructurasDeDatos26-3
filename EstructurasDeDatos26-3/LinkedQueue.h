@@ -1,5 +1,7 @@
 #pragma once
 #include "TNode.h"
+#include "ConsoleUI.h"
+#include <iostream>
 
 // =====================================================================
 //  LinkedQueue<T>  -  Cola generica (FIFO) sobre nodos enlazados
@@ -45,52 +47,95 @@ LinkedQueue<T>::LinkedQueue()
 template <class T>
 LinkedQueue<T>::~LinkedQueue()
 {
-    // TODO: liberar todos los nodos
+    Clear();
 }
 
 template <class T>
 void LinkedQueue<T>::Enqueue(T value)
 {
-    // TODO: agregar al final. Ojo con el caso de la cola vacia.
+    TNode<T>* n = new TNode<T>(value, _size);
+    n->setNext(nullptr);
+    if (IsEmpty())
+    {
+        _first = n;
+        _last = n;
+    }
+    else
+    {
+        _last->setNext(n);
+        _last = n;
+    }
+    _size++;
 }
 
 template <class T>
 T LinkedQueue<T>::Dequeue()
 {
-    // TODO: quitar el del frente, regresar su dato y LIBERAR el nodo.
-    //       Si la cola queda vacia, no olvides dejar _last en nullptr.
-    return T();
+    if (IsEmpty())
+    {
+        ConsoleUI::PrintError("LinkedQueue::Dequeue: cola vacia");
+        return T();
+    }
+    TNode<T>* nodo = _first;
+    T dato = nodo->getDato();
+    _first = nodo->getNext();
+    delete nodo;
+    _size--;
+    if (_first == nullptr)
+    {
+        _last = nullptr;
+    }
+    return dato;
 }
 
 template <class T>
 T LinkedQueue<T>::Front()
 {
-    // TODO: regresar el dato del frente SIN quitarlo
-    return T();
+    if (IsEmpty())
+    {
+        ConsoleUI::PrintError("LinkedQueue::Front: cola vacia");
+        return T();
+    }
+    return _first->getDato();
 }
 
 template <class T>
 bool LinkedQueue<T>::IsEmpty()
 {
-    // TODO
-    return true;
+    return _first == nullptr;
 }
 
 template <class T>
 int LinkedQueue<T>::GetSize()
 {
-    // TODO
-    return 0;
+    return _size;
 }
 
 template <class T>
 void LinkedQueue<T>::Clear()
 {
-    // TODO
+    while (!IsEmpty())
+    {
+        TNode<T>* tmp = _first;
+        _first = _first->getNext();
+        delete tmp;
+        _size--;
+    }
+    _first = nullptr;
+    _last = nullptr;
+    _size = 0;
 }
 
 template <class T>
 void LinkedQueue<T>::Print()
 {
-    // TODO: imprimir del frente hacia atras
+    TNode<T>* cur = _first;
+    std::cout << "[FRENTE] ";
+    while (cur != nullptr)
+    {
+        std::cout << cur->getDato();
+        if (cur->getNext() != nullptr) std::cout << " -> ";
+        cur = cur->getNext();
+    }
+    std::cout << " [FINAL]" << std::endl;
 }

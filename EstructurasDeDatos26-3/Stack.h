@@ -1,5 +1,8 @@
 #pragma once
 #include "TNode.h"
+#include "ConsoleUI.h"
+#include <iostream>
+#include <vector>
 
 // =====================================================================
 //  Stack<T>  -  Pila generica (LIFO)
@@ -47,75 +50,130 @@ Stack<T>::Stack()
 template <class T>
 Stack<T>::Stack(const Stack<T>& otro)
 {
-    // TODO: copia PROFUNDA. Hay que crear nodos NUEVOS con los mismos
-    // valores y en el mismo orden, no apuntar a los nodos de 'otro'.
     _top = nullptr;
     _size = 0;
+    // Copia profunda preservando orden
+    // Recolectar valores de arriba hacia abajo
+    std::vector<T> vals;
+    TNode<T>* cur = otro._top;
+    while (cur != nullptr)
+    {
+        vals.push_back(cur->getDato());
+        cur = cur->getNext();
+    }
+    // vals[0] = tope, vals.back() = fondo
+    // Push en orden inverso para conservar orden
+    for (int i = (int)vals.size() - 1; i >= 0; --i)
+    {
+        Push(vals[i]);
+    }
 }
 
 template <class T>
 Stack<T>& Stack<T>::operator=(const Stack<T>& otro)
 {
-    // TODO: 1) cuidado con la autoasignacion (a = a)
-    //       2) libera lo que ya tenias
-    //       3) copia profunda de 'otro'
+    if (this == &otro)
+        return *this;
+    Clear();
+    std::vector<T> vals;
+    TNode<T>* cur = otro._top;
+    while (cur != nullptr)
+    {
+        vals.push_back(cur->getDato());
+        cur = cur->getNext();
+    }
+    for (int i = (int)vals.size() - 1; i >= 0; --i)
+    {
+        Push(vals[i]);
+    }
     return *this;
 }
 
 template <class T>
 Stack<T>::~Stack()
 {
-    // TODO: liberar todos los nodos
+    Clear();
 }
 
 template <class T>
 void Stack<T>::Push(TNode<T>* n)
 {
-    // TODO: colocar 'n' como nuevo tope
+    if (n == nullptr) return;
+    n->setNext(_top);
+    _top = n;
+    _size++;
 }
 
 template <class T>
 void Stack<T>::Push(T value)
 {
-    // TODO: crear el nodo aqui adentro y mandarlo al Push privado
+    TNode<T>* n = new TNode<T>(value, _size);
+    Push(n);
 }
 
 template <class T>
 T Stack<T>::Pop()
 {
-    // TODO: quitar el tope, regresar su dato y LIBERAR el nodo
-    return T();
+    if (IsEmpty())
+    {
+        ConsoleUI::PrintError("Stack::Pop: pila vacia");
+        return T();
+    }
+    TNode<T>* nodo = _top;
+    T dato = nodo->getDato();
+    _top = nodo->getNext();
+    delete nodo;
+    _size--;
+    return dato;
 }
 
 template <class T>
 T Stack<T>::Top()
 {
-    // TODO: regresar el dato del tope SIN quitarlo
-    return T();
+    if (IsEmpty())
+    {
+        ConsoleUI::PrintError("Stack::Top: pila vacia");
+        return T();
+    }
+    return _top->getDato();
 }
 
 template <class T>
 bool Stack<T>::IsEmpty()
 {
-    // TODO
-    return true;
+    return _top == nullptr;
 }
 
 template <class T>
 int Stack<T>::GetSize()
 {
-    // TODO
-    return 0;
+    return _size;
 }
 
 template <class T>
 void Stack<T>::Clear()
 {
-    // TODO: vaciar la pila liberando todos los nodos
+    while (!IsEmpty())
+    {
+        TNode<T>* tmp = _top;
+        _top = _top->getNext();
+        delete tmp;
+        _size--;
+    }
+    _top = nullptr;
+    _size = 0;
 }
 
 template <class T>
 void Stack<T>::Print()
 {
-    // TODO: imprimir del tope hacia abajo
+    TNode<T>* cur = _top;
+    std::cout << "[TOPE] ";
+    while (cur != nullptr)
+    {
+        std::cout << cur->getDato();
+        if (cur->getNext() != nullptr) std::cout << " -> ";
+        cur = cur->getNext();
+    }
+    std::cout << " [FONDO]" << std::endl;
 }

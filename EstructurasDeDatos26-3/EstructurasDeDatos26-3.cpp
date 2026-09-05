@@ -93,6 +93,12 @@ void MenuPruebas()
     std::cout << "5.- Recursividad" << std::endl;
     std::cout << "6.- Grid" << std::endl;
     std::cout << "7.- Memoria" << std::endl;
+    std::cout << "8.- HashTable" << std::endl;
+    std::cout << "9.- Tree" << std::endl;
+    std::cout << "10.- Recorridos" << std::endl;
+    std::cout << "11.- Graph" << std::endl;
+    std::cout << "12.- GraphRecorridos" << std::endl;
+    std::cout << "13.- Ordenamientos" << std::endl;
     std::cout << "Elige un grupo: ";
     std::cin >> grupo;
 
@@ -113,6 +119,12 @@ void MenuPruebas()
     case 5: CorrerPruebasDe("Recursividad"); break;
     case 6: CorrerPruebasDe("Grid");         break;
     case 7: CorrerPruebasDe("Memoria");      break;
+    case 8:  CorrerPruebasDe("HashTable");  break;
+    case 9:  CorrerPruebasDe("Tree");       break;
+    case 10: CorrerPruebasDe("Recorridos"); break;
+    case 11: CorrerPruebasDe("Graph"); break;
+    case 12: CorrerPruebasDe("GraphRecorridos"); break;
+    case 13: CorrerPruebasDe("Ordenamientos"); break;
     default: ConsoleUI::PrintError("Grupo invalido."); break;
     }
 }
@@ -151,27 +163,27 @@ void DemoColas()
 
     ConsoleUI::PrintSeparator();
     ConsoleUI::PrintColor("LinkedQueue:", ConsoleUI::COLOR_CYAN);
-    LinkedQueue<int> colaA;
-    colaA.Enqueue(1);
-    colaA.Enqueue(2);
-    colaA.Enqueue(3);
+    LinkedQueue<int> linkedQueue;
+    linkedQueue.Enqueue(1);
+    linkedQueue.Enqueue(2);
+    linkedQueue.Enqueue(3);
     std::cout << "  Contenido: ";
-    colaA.Print();
-    std::cout << "  Front:   " << colaA.Front() << std::endl;
-    std::cout << "  Dequeue: " << colaA.Dequeue() << std::endl;
-    std::cout << "  Dequeue: " << colaA.Dequeue() << std::endl;
+    linkedQueue.Print();
+    std::cout << "  Front:   " << linkedQueue.Front() << std::endl;
+    std::cout << "  Dequeue: " << linkedQueue.Dequeue() << std::endl;
+    std::cout << "  Dequeue: " << linkedQueue.Dequeue() << std::endl;
 
     ConsoleUI::PrintSeparator();
     ConsoleUI::PrintColor("TwoStackQueue:", ConsoleUI::COLOR_MAGENTA);
-    TwoStackQueue<int> colaB;
-    colaB.Enqueue(1);
-    colaB.Enqueue(2);
-    colaB.Enqueue(3);
+    TwoStackQueue<int> twoStackQueue;
+    twoStackQueue.Enqueue(1);
+    twoStackQueue.Enqueue(2);
+    twoStackQueue.Enqueue(3);
     std::cout << "  Contenido: ";
-    colaB.Print();
-    std::cout << "  Front:   " << colaB.Front() << std::endl;
-    std::cout << "  Dequeue: " << colaB.Dequeue() << std::endl;
-    std::cout << "  Dequeue: " << colaB.Dequeue() << std::endl;
+    twoStackQueue.Print();
+    std::cout << "  Front:   " << twoStackQueue.Front() << std::endl;
+    std::cout << "  Dequeue: " << twoStackQueue.Dequeue() << std::endl;
+    std::cout << "  Dequeue: " << twoStackQueue.Dequeue() << std::endl;
 
     ConsoleUI::PrintSeparator();
     std::cout << "Si las dos imprimen lo mismo, las dos cumplen el contrato." << std::endl;
@@ -224,11 +236,11 @@ void DemoGrid()
 
     Grid<int> tablero(8, 8);
 
-    for (int f = 0; f < tablero.GetFilas(); f++)
+    for (int currentRow = 0; currentRow < tablero.GetFilas(); currentRow++)
     {
-        for (int c = 0; c < tablero.GetColumnas(); c++)
+        for (int currentColumn = 0; currentColumn < tablero.GetColumnas(); currentColumn++)
         {
-            tablero.Set(f, c, rand() % 5 + 1);
+            tablero.Set(currentRow, currentColumn, rand() % 5 + 1);
         }
     }
 

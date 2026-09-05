@@ -57,72 +57,164 @@ HashTable<V>::HashTable(int capacidad)
     _capacidad = capacidad;
     _size = 0;
 
-    // TODO: reservar el arreglo de buckets y dejar CADA UNO en nullptr.
-    // Un bucket en nullptr significa "esta vacio".
+    if (_capacidad > 0)
+    {
+        _buckets = new Entry*[_capacidad];
+        for (int bucketIndex = 0; bucketIndex < _capacidad; bucketIndex++)
+        {
+            _buckets[bucketIndex] = nullptr;
+        }
+    }
 }
 
 template <class V>
 HashTable<V>::~HashTable()
 {
-    // TODO: por cada bucket, recorrer su cadena liberando cada Entry.
-    //       Al final, liberar el arreglo de buckets.
+    if (_buckets != nullptr)
+    {
+        for (int bucketIndex = 0; bucketIndex < _capacidad; bucketIndex++)
+        {
+            Entry* currentEntry = _buckets[bucketIndex];
+            while (currentEntry != nullptr)
+            {
+                Entry* entryToDelete = currentEntry;
+                currentEntry = currentEntry->next;
+                delete entryToDelete;
+            }
+        }
+        delete[] _buckets;
+        _buckets = nullptr;
+    }
+    _capacidad = 0;
+    _size = 0;
 }
 
 template <class V>
 int HashTable<V>::Hash(std::string key)
 {
-    // TODO: convertir la llave en un numero entre 0 y _capacidad-1.
-    //
-    // Recorre los caracteres de la llave y combinalos en un acumulador.
-    // Al final aplica el modulo para que quepa en el rango de buckets.
-    //
-    // OJO: si solo SUMAS los caracteres, "abc" y "cba" te van a dar el
-    // mismo numero, porque la suma no distingue el orden. Hay una prueba
-    // que verifica justo eso. Busca "funcion hash para cadenas" y ve
-    // como se resuelve.
-    return 0;
+    if (_capacidad <= 0) return 0;
+
+    // Algoritmo djb2 para cadenas:
+    // Multiplica por 33 y suma el caracter.
+    // Preserva el orden de los caracteres (distingue "abc" y "cba").
+    unsigned long hash = 5381;
+    for (char currentCharacter : key)
+    {
+        hash = ((hash << 5) + hash) + static_cast<unsigned char>(currentCharacter);
+    }
+
+    return static_cast<int>(hash % static_cast<unsigned long>(_capacidad));
 }
 
 template <class V>
 void HashTable<V>::Insert(std::string key, V value)
 {
-    // TODO: 1) calcular el bucket con Hash()
-    //       2) si la llave YA existe en ese bucket, reemplazar su valor
-    //          (no crear una entrada duplicada, y no subir _size)
-    //       3) si no existe, crear la Entry y engancharla en la cadena
+    if (_capacidad <= 0 || _buckets == nullptr) return;
+
+    int index = Hash(key);
+    Entry* currentEntry = _buckets[index];
+
+    // Buscar si la llave ya existe
+    while (currentEntry != nullptr)
+    {
+        if (currentEntry->key == key)
+        {
+            currentEntry->value = value;
+            return;
+        }
+        currentEntry = currentEntry->next;
+    }
+
+    // Si no existe, crear la nueva entrada y agregarla al inicio del bucket
+    Entry* newEntry = new Entry();
+    newEntry->key = key;
+    newEntry->value = value;
+    newEntry->next = _buckets[index];
+    _buckets[index] = newEntry;
+    _size++;
 }
 
 template <class V>
 V HashTable<V>::Get(std::string key)
 {
-    // TODO: buscar en la cadena del bucket correspondiente.
-    //       Si no existe, avisar con ConsoleUI::PrintError y regresar V().
+    if (_capacidad <= 0 || _buckets == nullptr)
+    {
+        ConsoleUI::PrintError("HashTable::Get: tabla vacia o invalida");
+        return V();
+    }
+
+    int index = Hash(key);
+    Entry* currentEntry = _buckets[index];
+
+    while (currentEntry != nullptr)
+    {
+        if (currentEntry->key == key)
+        {
+            return currentEntry->value;
+        }
+        currentEntry = currentEntry->next;
+    }
+
+    ConsoleUI::PrintError("HashTable::Get: llave no encontrada");
     return V();
 }
 
 template <class V>
 bool HashTable<V>::Contains(std::string key)
 {
-    // TODO
+    if (_capacidad <= 0 || _buckets == nullptr) return false;
+
+    int index = Hash(key);
+    Entry* currentEntry = _buckets[index];
+
+    while (currentEntry != nullptr)
+    {
+        if (currentEntry->key == key)
+        {
+            return true;
+        }
+        currentEntry = currentEntry->next;
+    }
+
     return false;
 }
 
 template <class V>
 bool HashTable<V>::Remove(std::string key)
 {
-    // TODO: quitar la entrada de la cadena y liberarla.
-    //       Regresa true si la quito, false si la llave no existia.
-    //
-    // CUIDADO: quitar la PRIMERA de la cadena no es igual que quitar
-    // una de en medio. Vas a necesitar recordar la entrada anterior.
+    if (_capacidad <= 0 || _buckets == nullptr) return false;
+
+    int index = Hash(key);
+    Entry* currentEntry = _buckets[index];
+    Entry* previousEntry = nullptr;
+
+    while (currentEntry != nullptr)
+    {
+        if (currentEntry->key == key)
+        {
+            if (previousEntry == nullptr)
+            {
+                _buckets[index] = currentEntry->next;
+            }
+            else
+            {
+                previousEntry->next = currentEntry->next;
+            }
+            delete currentEntry;
+            _size--;
+            return true;
+        }
+        previousEntry = currentEntry;
+        currentEntry = currentEntry->next;
+    }
+
     return false;
 }
 
 template <class V>
 int HashTable<V>::GetSize()
 {
-    // TODO
-    return 0;
+    return _size;
 }
 
 template <class V>
@@ -134,6 +226,25 @@ int HashTable<V>::GetCapacidad()
 template <class V>
 void HashTable<V>::Print()
 {
-    // TODO: imprimir bucket por bucket, mostrando las llaves de cada
-    // cadena. Asi puedes VER las colisiones con tus propios ojos.
+    if (_buckets == nullptr) return;
+
+    for (int bucketIndex = 0; bucketIndex < _capacidad; bucketIndex++)
+    {
+        std::cout << "Bucket " << bucketIndex << ": ";
+        Entry* currentEntry = _buckets[bucketIndex];
+        if (currentEntry == nullptr)
+        {
+            std::cout << "(vacio)";
+        }
+        while (currentEntry != nullptr)
+        {
+            std::cout << "[" << currentEntry->key << ": " << currentEntry->value << "]";
+            if (currentEntry->next != nullptr)
+            {
+                std::cout << " -> ";
+            }
+            currentEntry = currentEntry->next;
+        }
+        std::cout << std::endl;
+    }
 }

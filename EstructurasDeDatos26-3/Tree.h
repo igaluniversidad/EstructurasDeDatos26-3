@@ -7,8 +7,8 @@
 // =====================================================================
 //  Tree<T>  -  Arbol binario de busqueda (BST)
 //
-//  La regla del BST: todo lo MENOR que un nodo vive a su izquierda,
-//  todo lo MAYOR vive a su derecha. Gracias a esa regla, buscar no
+//  La regla del BST: todo lo MENOR que un nodo vive a su leftHeightuierda,
+//  todo lo MAYOR vive a su rightHeightecha. Gracias a esa regla, buscar no
 //  recorre todo: en cada nodo descartas la mitad del arbol.
 //
 //  LOS RECORRIDOS no imprimen: LLENAN una LinkedList<T> que se les
@@ -17,9 +17,9 @@
 //
 //  Los tres recorridos DFS recursivos son LAS MISMAS TRES LINEAS con
 //  la linea de "agregar al resultado" en distinto lugar:
-//      Pre-orden:   nodo,        izquierda,   derecha
-//      In-orden:    izquierda,   nodo,        derecha    <- sale ORDENADO
-//      Post-orden:  izquierda,   derecha,     nodo
+//      Pre-orden:   nodo,        leftHeightuierda,   rightHeightecha
+//      In-orden:    leftHeightuierda,   nodo,        rightHeightecha    <- sale ORDENADO
+//      Post-orden:  leftHeightuierda,   rightHeightecha,     nodo
 //  Escribe uno, y los otros dos son mover una linea.
 // =====================================================================
 
@@ -39,15 +39,15 @@ private:
 
     // Auxiliares recursivas. Reciben el nodo actual porque la recursion
     // necesita "bajar", y desde afuera nadie ve los nodos.
-    void DestruirRec(Node* n);
-    void InsertRec(Node*& n, T valor);
-    bool ContainsRec(Node* n, T valor);
-    int  AlturaRec(Node* n);
+    void DestruirRec(Node* currentNode);
+    void InsertRec(Node*& currentNode, T valor);
+    bool ContainsRec(Node* currentNode, T valor);
+    int  AlturaRec(Node* currentNode);
 
-    void PreRec(Node* n, LinkedList<T>& resultado);
-    void InRec(Node* n, LinkedList<T>& resultado);
-    void PostRec(Node* n, LinkedList<T>& resultado);
-    void NivelRec(Node* n, int nivel, LinkedList<T>& resultado);
+    void PreRec(Node* currentNode, LinkedList<T>& resultado);
+    void InRec(Node* currentNode, LinkedList<T>& resultado);
+    void PostRec(Node* currentNode, LinkedList<T>& resultado);
+    void NivelRec(Node* currentNode, int nivel, LinkedList<T>& resultado);
 
 public:
     Tree();
@@ -82,162 +82,207 @@ Tree<T>::Tree()
 template <class T>
 Tree<T>::~Tree()
 {
-    // TODO: llamar a DestruirRec desde la raiz
+    DestruirRec(_root);
+    _root = nullptr;
+    _size = 0;
 }
 
 template <class T>
-void Tree<T>::DestruirRec(Node* n)
+void Tree<T>::DestruirRec(Node* currentNode)
 {
-    // TODO: destruir primero los hijos y HASTA EL FINAL el nodo actual.
-    // Si borras el nodo antes que sus hijos, pierdes la forma de llegar
-    // a ellos. Fijate que ese orden es exactamente el POST-ORDEN.
+    // Post-orden: primero los hijos, al final el nodo actual.
+    if (currentNode == nullptr) return;
+    DestruirRec(currentNode->left);
+    DestruirRec(currentNode->right);
+    delete currentNode;
 }
 
 template <class T>
 void Tree<T>::Insert(T valor)
 {
-    // TODO: arrancar la recursion desde la raiz
+    InsertRec(_root, valor);
 }
 
 template <class T>
-void Tree<T>::InsertRec(Node*& n, T valor)
+void Tree<T>::InsertRec(Node*& currentNode, T valor)
 {
-    // TODO: si n es nullptr, aqui va el nodo nuevo (y sube _size).
-    //       Si el valor es menor, baja a la izquierda.
-    //       Si es mayor, baja a la derecha.
-    //       Si es igual, no hagas nada: no se permiten duplicados.
-    //
-    // OJO con la firma: 'Node*& n' es una REFERENCIA a puntero. Eso es
-    // lo que te permite asignarle el nodo nuevo y que el cambio se vea
-    // en el padre. Con 'Node* n' a secas, modificarias una copia del
-    // puntero y el arbol se quedaria vacio.
+    // Si llegamos a un hueco, aqui va el nodo nuevo.
+    // Gracias a que currentNode es referencia a puntero, el padre queda enlazado.
+    if (currentNode == nullptr)
+    {
+        currentNode = new Node();
+        currentNode->data = valor;
+        currentNode->left = nullptr;
+        currentNode->right = nullptr;
+        _size++;
+        return;
+    }
+    if (valor < currentNode->data)
+    {
+        InsertRec(currentNode->left, valor);
+    }
+    else if (valor > currentNode->data)
+    {
+        InsertRec(currentNode->right, valor);
+    }
+    // Si es igual, no se hace nada: no se permiten duplicados.
 }
 
 template <class T>
 bool Tree<T>::Contains(T valor)
 {
-    // TODO
-    return false;
+    return ContainsRec(_root, valor);
 }
 
 template <class T>
-bool Tree<T>::ContainsRec(Node* n, T valor)
+bool Tree<T>::ContainsRec(Node* currentNode, T valor)
 {
-    // TODO: caso base cuando n es nullptr (no esta).
-    //       Si no, compara y baja por el lado que corresponde.
-    return false;
+    if (currentNode == nullptr) return false;
+    if (valor == currentNode->data) return true;
+    if (valor < currentNode->data) return ContainsRec(currentNode->left, valor);
+    return ContainsRec(currentNode->right, valor);
 }
 
 template <class T>
 int Tree<T>::GetSize()
 {
-    // TODO
-    return 0;
+    return _size;
 }
 
 template <class T>
 int Tree<T>::GetAltura()
 {
-    // TODO
-    return 0;
+    return AlturaRec(_root);
 }
 
 template <class T>
-int Tree<T>::AlturaRec(Node* n)
+int Tree<T>::AlturaRec(Node* currentNode)
 {
-    // TODO: un arbol vacio mide 0. Si no, mide 1 mas que el MAS ALTO
-    //       de sus dos subarboles.
-    return 0;
+    if (currentNode == nullptr) return 0;
+    int leftHeight = AlturaRec(currentNode->left);
+    int rightHeight = AlturaRec(currentNode->right);
+    return 1 + (leftHeight > rightHeight ? leftHeight : rightHeight);
 }
 
 template <class T>
 void Tree<T>::PreOrden(LinkedList<T>& resultado)
 {
-    // TODO: arrancar PreRec desde la raiz
+    PreRec(_root, resultado);
 }
 
 template <class T>
-void Tree<T>::PreRec(Node* n, LinkedList<T>& resultado)
+void Tree<T>::PreRec(Node* currentNode, LinkedList<T>& resultado)
 {
-    // TODO: nodo, izquierda, derecha
+    if (currentNode == nullptr) return;
+    resultado.Add(currentNode->data);
+    PreRec(currentNode->left, resultado);
+    PreRec(currentNode->right, resultado);
 }
 
 template <class T>
 void Tree<T>::InOrden(LinkedList<T>& resultado)
 {
-    // TODO
+    InRec(_root, resultado);
 }
 
 template <class T>
-void Tree<T>::InRec(Node* n, LinkedList<T>& resultado)
+void Tree<T>::InRec(Node* currentNode, LinkedList<T>& resultado)
 {
-    // TODO: izquierda, nodo, derecha
+    if (currentNode == nullptr) return;
+    InRec(currentNode->left, resultado);
+    resultado.Add(currentNode->data);
+    InRec(currentNode->right, resultado);
 }
 
 template <class T>
 void Tree<T>::PostOrden(LinkedList<T>& resultado)
 {
-    // TODO
+    PostRec(_root, resultado);
 }
 
 template <class T>
-void Tree<T>::PostRec(Node* n, LinkedList<T>& resultado)
+void Tree<T>::PostRec(Node* currentNode, LinkedList<T>& resultado)
 {
-    // TODO: izquierda, derecha, nodo
+    if (currentNode == nullptr) return;
+    PostRec(currentNode->left, resultado);
+    PostRec(currentNode->right, resultado);
+    resultado.Add(currentNode->data);
 }
 
 template <class T>
 void Tree<T>::InOrdenIterativo(LinkedList<T>& resultado)
 {
-    // TODO: el mismo in-orden, pero SIN recursion, usando TU Stack<Node*>.
-    //
-    // La idea: baja lo mas a la izquierda que puedas, apilando cada nodo
-    // por el que pasas. Cuando ya no puedas bajar mas, saca uno de la
-    // pila, agregalo al resultado, y muevete a SU hijo derecho.
-    // Repite mientras queden nodos o la pila no este vacia.
-    //
-    // Aqui esta la leccion: la pila que el compilador manejaba solo en
-    // la version recursiva, ahora la manejas tu a mano. Son la misma
-    // cosa con distinta ropa.
+    // In-orden sin recursion: nodeStack guarda los nodos pendientes.
+    // Es el mismo trabajo que hacia la pila de llamadas del compilador.
+    Stack<Node*> nodeStack;
+    Node* currentNode = _root;
+
+    while (currentNode != nullptr || !nodeStack.IsEmpty())
+    {
+        // Bajar lo mas a la leftHeightuierda posible, apilando el camino.
+        while (currentNode != nullptr)
+        {
+            nodeStack.Push(currentNode);
+            currentNode = currentNode->left;
+        }
+        // Ya no se puede bajar: sacar uno, procesarlo, ir a su rightHeightecha.
+        currentNode = nodeStack.Pop();
+        resultado.Add(currentNode->data);
+        currentNode = currentNode->right;
+    }
 }
 
 template <class T>
 void Tree<T>::PorNiveles(LinkedList<T>& resultado)
 {
-    // TODO: BFS con TU LinkedQueue<Node*>.
-    //
-    // Mete la raiz a la cola. Mientras la cola no este vacia:
-    // saca uno, agregalo al resultado, y encola a sus hijos
-    // (primero el izquierdo, luego el derecho).
-    //
-    // Fijate: es el MISMO algoritmo que el de arriba, pero cambiando
-    // la pila por una cola. Eso solito convierte un DFS en un BFS.
+    // BFS con cola: mismo esquema que el DFS iterativo,
+    // pero la cola produce orden por niveles.
+    if (_root == nullptr) return;
+
+    LinkedQueue<Node*> nodeQueue;
+    nodeQueue.Enqueue(_root);
+
+    while (!nodeQueue.IsEmpty())
+    {
+        Node* currentNode = nodeQueue.Dequeue();
+        resultado.Add(currentNode->data);
+        if (currentNode->left != nullptr) nodeQueue.Enqueue(currentNode->left);
+        if (currentNode->right != nullptr) nodeQueue.Enqueue(currentNode->right);
+    }
 }
 
 template <class T>
 void Tree<T>::PorNivelesRecursivo(LinkedList<T>& resultado)
 {
-    // TODO: el mismo resultado que PorNiveles, pero SIN cola.
-    //
-    // Estrategia: pide la altura del arbol, y luego, para cada nivel
-    // del 1 hasta la altura, baja recursivamente y agrega solo los
-    // nodos de ESE nivel.
-    //
-    // Va a ser mas lento que la version con cola: los nodos de arriba
-    // se vuelven a recorrer una vez por cada nivel que hay debajo.
-    // Compara las dos versiones y piensa por que.
+    // Sin cola: se visita cada nivel por separado.
+    // Mas lento porque los nodos de arriba se recorren
+    // una vez por cada nivel que hay debajo de ellos.
+    int treeHeight = GetAltura();
+    for (int nivel = 1; nivel <= treeHeight; nivel++)
+    {
+        NivelRec(_root, nivel, resultado);
+    }
 }
 
 template <class T>
-void Tree<T>::NivelRec(Node* n, int nivel, LinkedList<T>& resultado)
+void Tree<T>::NivelRec(Node* currentNode, int nivel, LinkedList<T>& resultado)
 {
-    // TODO: si nivel == 1, este nodo es de los que van al resultado.
-    //       Si no, baja a los dos hijos pidiendo el nivel de abajo.
+    if (currentNode == nullptr) return;
+    if (nivel == 1)
+    {
+        resultado.Add(currentNode->data);
+        return;
+    }
+    NivelRec(currentNode->left, nivel - 1, resultado);
+    NivelRec(currentNode->right, nivel - 1, resultado);
 }
 
 template <class T>
 void Tree<T>::Print()
 {
-    // TODO: usa el recorrido in-orden y ConsoleUI para mostrar el arbol.
-    // Casi todo el trabajo ya lo hiciste: aqui solo lo conectas.
+    // Muestra el arbol en in-orden (sale ordenado en un BST).
+    LinkedList<T> recorrido;
+    InOrden(recorrido);
+    ConsoleUI::PrintTitle("ARBOL (IN-ORDEN)");
+    recorrido.Print();
 }

@@ -287,39 +287,38 @@ void DemoGrid()
     ConsoleUI::Pause();
 }
 
-void DemoComparacionAVL()
-{
-    // Parte 4: comparacion obligatoria BST (Tree) vs AVL (AVLTree).
-    // Se insertan los numeros del 1 al 15 en orden creciente en AMBOS.
-    std::cout << std::endl;
-    ConsoleUI::PrintTitle("DEMO COMPARACION BST vs AVL (1 AL 15 EN ORDEN)");
+void DemoComparacionAVL() // demo pedida en la Parte 4
+{ // abre demo
+    // Meto 1..15 en orden en los dos arboles para comparar.
+    std::cout << std::endl; // dejo un renglon libre
+    ConsoleUI::PrintTitle("DEMO COMPARACION BST vs AVL (1 AL 15 EN ORDEN)"); // pongo titulo
 
-    Tree<int> bst;
-    AVLTree<int> avl;
-    for (int i = 1; i <= 15; i++)
-    {
-        bst.Insert(i);
-        avl.Insert(i);
-    }
+    Tree<int> bst; // creo un BST normal (el de la practica 5)
+    AVLTree<int> avl; // creo un AVL (el nuevo, que se balancea)
+    for (int i = 1; i <= 15; i++) // repito del 1 al 15
+    { // abre for
+        bst.Insert(i); // meto i en el BST
+        avl.Insert(i); // meto i en el AVL
+    } // cierra for
 
-    std::cout << "Altura BST (Tree): " << bst.GetAltura() << std::endl;
-    std::cout << "Altura AVL (AVLTree): " << avl.GetAltura() << std::endl;
-    ConsoleUI::PrintSeparator();
+    std::cout << "Altura BST (Tree): " << bst.GetAltura() << std::endl; // muestro altura del BST (da 15)
+    std::cout << "Altura AVL (AVLTree): " << avl.GetAltura() << std::endl; // muestro altura del AVL (da 4)
+    ConsoleUI::PrintSeparator(); // pongo una linea para separar
 
-    LinkedList<int> recBST;
-    LinkedList<int> recAVL;
-    bst.InOrden(recBST);
-    avl.InOrden(recAVL);
+    LinkedList<int> recBST; // lista para guardar el in-orden del BST
+    LinkedList<int> recAVL; // lista para guardar el in-orden del AVL
+    bst.InOrden(recBST); // lleno la lista del BST en orden
+    avl.InOrden(recAVL); // lleno la lista del AVL en orden
 
-    std::cout << "In-orden BST: ";
-    recBST.Print();
-    std::cout << "In-orden AVL: ";
-    recAVL.Print();
+    std::cout << "In-orden BST: "; // aviso que viene el recorrido BST
+    recBST.Print(); // muestro el recorrido BST
+    std::cout << "In-orden AVL: "; // aviso que viene el recorrido AVL
+    recAVL.Print(); // muestro el recorrido AVL
 
-    ConsoleUI::PrintSeparator();
-    std::cout << "El BST degenera a altura 15 (lista con pasos extra)." << std::endl;
-    std::cout << "El AVL se queda en altura 4 gracias a las rotaciones." << std::endl;
-    std::cout << "Ambos in-orden salen identicos: 1..15 ordenado." << std::endl;
+    ConsoleUI::PrintSeparator(); // otra linea para separar
+    std::cout << "El BST degenera a altura 15 (lista con pasos extra)." << std::endl; // explico lo del BST
+    std::cout << "El AVL se queda en altura 4 gracias a las rotaciones." << std::endl; // explico lo del AVL
+    std::cout << "Ambos in-orden salen identicos: 1..15 ordenado." << std::endl; // lo importante: el orden no se rompe
 
-    ConsoleUI::Pause();
-}
+    ConsoleUI::Pause(); // espero tecla para que se alcance a leer
+} // cierra demo

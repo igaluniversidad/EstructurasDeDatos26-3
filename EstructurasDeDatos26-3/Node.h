@@ -48,51 +48,48 @@ Node<T>::Node()
 template <class T>
 Node<T>::Node(T valor)
 {
-    // TODO: guardar el valor y dejar _visited en false
+    _value = valor; // guardo el dato que me pasan
+    _visited = false; // al inicio nadie lo ha visitado
 }
 
 template <class T>
 T Node<T>::GetValue()
 {
-    // TODO
-    return T();
+    return _value; // regreso el dato guardado
 }
 
 template <class T>
 void Node<T>::SetValue(T valor)
 {
-    // TODO
+    _value = valor; // cambio el dato por el nuevo
 }
 
 template <class T>
 void Node<T>::SetVisited(bool visitado)
 {
-    // TODO
+    _visited = visitado; // marco si ya se visito o no
 }
 
 template <class T>
 bool Node<T>::GetVisited()
 {
-    // TODO
-    return false;
+    return _visited; // digo si ya se visito
 }
 
 template <class T>
 void Node<T>::AddNeighbor(Edge<T>* arista)
 {
-    // TODO: agregar la arista a la lista de vecinos
+    _neighbors.Add(arista); // agrego la arista a mi lista de vecinos
 }
 
 template <class T>
 int Node<T>::GetNeighborCount()
 {
-    // TODO
-    return 0;
+    return _neighbors.GetSize(); // regreso cuantos vecinos tengo
 }
 
 template <class T>
 Edge<T>* Node<T>::GetNeighbor(int indice)
 {
-    // TODO
-    return nullptr;
+    return _neighbors.GetAt(indice); // regreso la arista de esa posicion
 }

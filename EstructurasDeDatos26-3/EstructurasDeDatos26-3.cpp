@@ -14,6 +14,8 @@
 #include "TwoStackQueue.h"
 #include "LinkedList.h"
 #include "Grid.h"
+#include "Tree.h"
+#include "AVLTree.h"
 #include "Tests.h"
 
 void MenuPruebas();
@@ -21,6 +23,7 @@ void DemoStack();
 void DemoColas();
 void DemoLista();
 void DemoGrid();
+void DemoComparacionAVL();
 
 int main()
 {
@@ -36,6 +39,7 @@ int main()
         std::cout << "2.- Demo Colas (LinkedQueue vs TwoStackQueue)" << std::endl;
         std::cout << "3.- Demo Lista Ligada" << std::endl;
         std::cout << "4.- Demo Grid / Flood Fill" << std::endl;
+        std::cout << "5.- Demo Comparacion BST vs AVL (Parte 4)" << std::endl;
         ConsoleUI::PrintSeparator();
         std::cout << "8.- Correr TODAS las pruebas" << std::endl;
         std::cout << "9.- Correr pruebas de un grupo" << std::endl;
@@ -59,6 +63,7 @@ int main()
         case 2: DemoColas();  break;
         case 3: DemoLista();  break;
         case 4: DemoGrid();   break;
+        case 5: DemoComparacionAVL(); break;
 
         case 8: CorrerTodasLasPruebas(); break;
         case 9: MenuPruebas();           break;
@@ -99,6 +104,7 @@ void MenuPruebas()
     std::cout << "11.- Graph" << std::endl;
     std::cout << "12.- GraphRecorridos" << std::endl;
     std::cout << "13.- Ordenamientos" << std::endl;
+    std::cout << "14.- AVL" << std::endl;
     std::cout << "Elige un grupo: ";
     std::cin >> grupo;
 
@@ -125,6 +131,7 @@ void MenuPruebas()
     case 11: CorrerPruebasDe("Graph"); break;
     case 12: CorrerPruebasDe("GraphRecorridos"); break;
     case 13: CorrerPruebasDe("Ordenamientos"); break;
+    case 14: CorrerPruebasDe("AVL");   break;
     default: ConsoleUI::PrintError("Grupo invalido."); break;
     }
 }
@@ -276,6 +283,43 @@ void DemoGrid()
     {
         ConsoleUI::PrintColor("Muy pocas: no formaria combinacion.", ConsoleUI::COLOR_AMARILLO);
     }
+
+    ConsoleUI::Pause();
+}
+
+void DemoComparacionAVL()
+{
+    // Parte 4: comparacion obligatoria BST (Tree) vs AVL (AVLTree).
+    // Se insertan los numeros del 1 al 15 en orden creciente en AMBOS.
+    std::cout << std::endl;
+    ConsoleUI::PrintTitle("DEMO COMPARACION BST vs AVL (1 AL 15 EN ORDEN)");
+
+    Tree<int> bst;
+    AVLTree<int> avl;
+    for (int i = 1; i <= 15; i++)
+    {
+        bst.Insert(i);
+        avl.Insert(i);
+    }
+
+    std::cout << "Altura BST (Tree): " << bst.GetAltura() << std::endl;
+    std::cout << "Altura AVL (AVLTree): " << avl.GetAltura() << std::endl;
+    ConsoleUI::PrintSeparator();
+
+    LinkedList<int> recBST;
+    LinkedList<int> recAVL;
+    bst.InOrden(recBST);
+    avl.InOrden(recAVL);
+
+    std::cout << "In-orden BST: ";
+    recBST.Print();
+    std::cout << "In-orden AVL: ";
+    recAVL.Print();
+
+    ConsoleUI::PrintSeparator();
+    std::cout << "El BST degenera a altura 15 (lista con pasos extra)." << std::endl;
+    std::cout << "El AVL se queda en altura 4 gracias a las rotaciones." << std::endl;
+    std::cout << "Ambos in-orden salen identicos: 1..15 ordenado." << std::endl;
 
     ConsoleUI::Pause();
 }

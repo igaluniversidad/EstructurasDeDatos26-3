@@ -251,29 +251,43 @@ typename AVLTree<T>::Node* AVLTree<T>::Balancear(Node* n)
 template <class T>
 void AVLTree<T>::Insert(T valor)
 {
-    // TODO: arrancar la recursion y GUARDAR el resultado en _root.
-    // Ese "guardar" es importante: si la raiz rota, _root cambia.
+    // Se guarda el resultado porque la raiz puede cambiar si rota.
+    _root = InsertRec(_root, valor);
 }
 
 template <class T>
 typename AVLTree<T>::Node* AVLTree<T>::InsertRec(Node* n, T valor)
 {
-    // TODO: la estructura es la misma de tu BST (bajar a la izquierda o
-    // a la derecha segun la comparacion, no admitir duplicados), con dos
-    // diferencias:
-    //
-    //   1. Guarda el resultado de la llamada recursiva:
-    //          n->left = InsertRec(n->left, valor);
-    //
-    //   2. Al REGRESAR de la recursion, llama a Balancear(n) y regresa
-    //      lo que te de.
-    //
-    // Ese "al regresar" es lo mismo que ya hiciste con PrintReverse y
-    // con el post-orden: la accion ocurre cuando la recursion se
-    // devuelve, no cuando baja.
-    //
-    // El nodo nuevo nace con altura 1.
-    return n;
+    // Caso base: hueco libre, aqui nace el nodo nuevo con altura 1.
+    if (n == nullptr)
+    {
+        Node* nuevo = new Node();
+        nuevo->data = valor;
+        nuevo->left = nullptr;
+        nuevo->right = nullptr;
+        nuevo->height = 1;
+        _size++;
+        return nuevo;
+    }
+
+    // Bajar como en el BST, guardando el resultado de la recursion
+    // porque el hijo pudo rotar y cambiar de raiz.
+    if (valor < n->data)
+    {
+        n->left = InsertRec(n->left, valor);
+    }
+    else if (valor > n->data)
+    {
+        n->right = InsertRec(n->right, valor);
+    }
+    else
+    {
+        // Duplicado: no se inserta, no cambia nada ni el tamanio.
+        return n;
+    }
+
+    // Al REGRESAR: rebalancear este subarbol y regresar quien quedo arriba.
+    return Balancear(n);
 }
 
 
@@ -284,49 +298,48 @@ typename AVLTree<T>::Node* AVLTree<T>::InsertRec(Node* n, T valor)
 template <class T>
 bool AVLTree<T>::Contains(T valor)
 {
-    // TODO
-    return false;
+    return ContainsRec(_root, valor);
 }
 
 template <class T>
 bool AVLTree<T>::ContainsRec(Node* n, T valor)
 {
-    // TODO: igual que en tu BST. El balanceo no cambia como se busca,
+    // Igual que en el BST: el balanceo no cambia como se busca,
     // solo garantiza que la busqueda sea corta.
-    return false;
+    if (n == nullptr) return false;
+    if (valor == n->data) return true;
+    if (valor < n->data) return ContainsRec(n->left, valor);
+    return ContainsRec(n->right, valor);
 }
 
 template <class T>
 int AVLTree<T>::GetSize()
 {
-    // TODO
-    return 0;
+    return _size;
 }
 
 template <class T>
 int AVLTree<T>::GetAltura()
 {
-    // TODO: la altura del arbol completo.
-    return 0;
+    // Altura del arbol completo (0 si esta vacio).
+    return Altura(_root);
 }
 
 template <class T>
 bool AVLTree<T>::EstaBalanceado()
 {
-    // TODO
-    return true;
+    return BalanceadoRec(_root);
 }
 
 template <class T>
 bool AVLTree<T>::BalanceadoRec(Node* n)
 {
-    // TODO: un nodo nulo esta balanceado. Si no, su factor debe estar
-    // entre -1 y 1, Y sus dos hijos tambien deben estar balanceados.
-    //
-    // Esta funcion es tu DETECTOR: llamala despues de cada insercion
-    // mientras depuras. En cuanto regrese false, la insercion que
-    // acabas de hacer es la que rompio algo.
-    return true;
+    // Nulo = balanceado. Si no, el factor debe estar en [-1, 1]
+    // y ambos hijos tambien deben estarlo.
+    if (n == nullptr) return true;
+    int factor = FactorBalance(n);
+    if (factor < -1 || factor > 1) return false;
+    return BalanceadoRec(n->left) && BalanceadoRec(n->right);
 }
 
 
@@ -337,21 +350,26 @@ bool AVLTree<T>::BalanceadoRec(Node* n)
 template <class T>
 void AVLTree<T>::InOrden(LinkedList<T>& resultado)
 {
-    // TODO
+    InRec(_root, resultado);
 }
 
 template <class T>
 void AVLTree<T>::InRec(Node* n, LinkedList<T>& resultado)
 {
-    // TODO: izquierda, nodo, derecha. En un arbol de busqueda sale
-    // ordenado, y eso es tu mejor verificacion: si tu in-orden sale
-    // desordenado, alguna rotacion esta moviendo un puntero al lado
-    // equivocado.
+    // Izquierda, nodo, derecha. En un BST sale ordenado: si sale
+    // desordenado, alguna rotacion movio un puntero al lado equivocado.
+    if (n == nullptr) return;
+    InRec(n->left, resultado);
+    resultado.Add(n->data);
+    InRec(n->right, resultado);
 }
 
 template <class T>
 void AVLTree<T>::Print()
 {
-    // TODO: usa el recorrido in-orden y ConsoleUI. Casi todo el trabajo
-    // ya lo hiciste: aqui solo lo conectas.
+    // Toda la impresion con formato pasa por ConsoleUI.
+    LinkedList<T> recorrido;
+    InOrden(recorrido);
+    ConsoleUI::PrintTitle("AVL (IN-ORDEN)");
+    recorrido.Print();
 }

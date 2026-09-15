@@ -62,103 +62,174 @@ Graph<T>::Graph()
 template <class T>
 Graph<T>::~Graph()
 {
-    // TODO: liberar TODAS las aristas y TODOS los nodos, recorriendo las
-    // dos listas del grafo. Una sola vez cada cosa.
+    // El grafo es el unico dueno, aqui se libera todo una sola vez.
+    for (int i = 0; i < _edges.GetSize(); i++) // recorro todas las aristas
+    {
+        delete _edges.GetAt(i); // borro cada arista
+    }
+    for (int i = 0; i < _nodes.GetSize(); i++) // recorro todos los nodos
+    {
+        delete _nodes.GetAt(i); // borro cada nodo
+    }
 }
 
 template <class T>
 Node<T>* Graph<T>::AddNode(T valor)
 {
-    // TODO: crear el nodo, guardarlo en _nodes, y regresarlo para que
-    // quien lo pidio pueda usarlo (por ejemplo, para conectarlo).
-    return nullptr;
+    Node<T>* nuevo = new Node<T>(valor); // creo un nodo nuevo con ese valor
+    _nodes.Add(nuevo); // lo guardo en mi lista de nodos
+    return nuevo; // lo regreso para poder usarlo despues
 }
 
 template <class T>
 void Graph<T>::AddEdge(Node<T>* a, Node<T>* b)
 {
-    // TODO: 1) validar que ninguno de los dos sea nullptr
-    //       2) crear la arista y guardarla en _edges
-    //       3) agregarla a la lista de vecinos de AMBOS nodos
-    //          (es un grafo NO dirigido: la conexion va en los dos
-    //           sentidos, y es LA MISMA arista, no una copia)
+    if (a == nullptr || b == nullptr) // si alguno no existe
+    {
+        return; // no hago nada y me salgo
+    }
+
+    Edge<T>* e = new Edge<T>(a, b); // creo la arista entre a y b
+    _edges.Add(e); // la guardo en mi lista de aristas
+
+    // Es no dirigido, la misma arista va en los dos nodos
+    a->AddNeighbor(e); // se la agrego al primer nodo
+    b->AddNeighbor(e); // se la agrego al segundo nodo
 }
 
 template <class T>
 int Graph<T>::GetNodeCount()
 {
-    // TODO
-    return 0;
+    return _nodes.GetSize(); // regreso cuantos nodos hay
 }
 
 template <class T>
 int Graph<T>::GetEdgeCount()
 {
-    // TODO
-    return 0;
+    return _edges.GetSize(); // regreso cuantas aristas hay
 }
 
 template <class T>
 void Graph<T>::ResetVisited()
 {
-    // TODO: poner en false el _visited de todos los nodos y de todas
-    // las aristas.
+    for (int i = 0; i < _nodes.GetSize(); i++) // recorro todos los nodos
+    {
+        _nodes.GetAt(i)->SetVisited(false); // los marco como no visitados
+    }
+    for (int i = 0; i < _edges.GetSize(); i++) // recorro todas las aristas
+    {
+        _edges.GetAt(i)->SetVisited(false); // las marco como no visitadas
+    }
 }
 
 template <class T>
 void Graph<T>::DFS(LinkedList<T>& resultado)
 {
-    // TODO: 1) llamar a ResetVisited() PRIMERO. Si no lo haces, correr
-    //          el recorrido dos veces te da vacio la segunda vez. Es el
-    //          mismo error que ya cazaste con el Flood Fill.
-    //
-    //       2) recorrer TU LISTA de nodos y, por cada nodo que siga sin
-    //          visitar, arrancar una nueva exploracion con DFSRec.
-    //
-    //          Esto ultimo es lo que hace que funcione con grafos
-    //          DESCONECTADOS. Si solo arrancas desde el primer nodo, un
-    //          grafo con dos islas te deja la mitad sin visitar.
+    ResetVisited(); // limpio las marcas para empezar de cero
+
+    for (int i = 0; i < _nodes.GetSize(); i++) // recorro todos los nodos
+    {
+        Node<T>* n = _nodes.GetAt(i); // agarro el nodo de esta posicion
+        if (!n->GetVisited()) // si todavia no lo visite
+        {
+            DFSRec(n, resultado); // empiezo a explorar desde ahi
+        }
+    }
 }
 
 template <class T>
 void Graph<T>::DFSRec(Node<T>* n, LinkedList<T>& resultado)
 {
-    // TODO: marcar el nodo como visitado, agregar su valor al resultado,
-    // y recorrer sus aristas.
-    //
-    // OJO con esto: en un grafo no dirigido, la arista por la que
-    // llegaste tambien aparece en la lista del nodo actual. Al seguir
-    // una arista tienes que preguntar cual de sus dos extremos NO es el
-    // nodo en el que estas parado. Ese es el paso que mas se olvida.
-    //
-    // Marca el nodo como visitado en cuanto ENTRAS a el, no al salir.
-    // Si lo marcas tarde, un ciclo te manda a un bucle infinito.
+    if (n == nullptr) // si me pasaron un nodo vacio
+    {
+        return; // no hago nada
+    }
+
+    n->SetVisited(true); // marco este nodo como visitado
+    resultado.Add(n->GetValue()); // agrego su valor al resultado
+
+    for (int i = 0; i < n->GetNeighborCount(); i++) // reviso todos sus vecinos
+    {
+        Edge<T>* e = n->GetNeighbor(i); // agarro la arista de esta posicion
+
+        // Ver cual es el otro extremo
+        Node<T>* otro = e->GetFrom(); // supongo que el otro es el origen
+        if (otro == n) // si el origen soy yo
+        {
+            otro = e->GetTo(); // entonces el otro es el destino
+        }
+
+        if (otro != nullptr && !otro->GetVisited()) // si existe y no lo visite
+        {
+            DFSRec(otro, resultado); // me voy para alla
+        }
+    }
 }
 
 template <class T>
 void Graph<T>::BFS(LinkedList<T>& resultado)
 {
-    // TODO: recorrido en anchura usando TU LinkedQueue<Node<T>*>.
-    //
-    // Mete el nodo inicial a la cola. Mientras la cola no este vacia:
-    // saca uno, agrega su valor al resultado, y encola a los vecinos que
-    // no hayan sido visitados.
-    //
-    // Marca al vecino como visitado EN EL MOMENTO DE ENCOLARLO, no
-    // cuando lo saques. Si esperas a sacarlo, el mismo nodo puede
-    // entrar dos veces a la cola y aparecer repetido.
-    //
-    // Igual que en DFS: ResetVisited() al inicio, y recorre tu lista de
-    // nodos para cubrir los grafos desconectados.
-    //
-    // Cuando termines, compara este metodo con DFSRec: es practicamente
-    // el mismo algoritmo, y lo unico que cambia es donde guardas los
-    // pendientes. Pila = profundidad. Cola = anchura.
+    ResetVisited(); // limpio las marcas para empezar de cero
+
+    LinkedQueue<Node<T>*> cola; // aqui guardo los que faltan por revisar
+
+    for (int i = 0; i < _nodes.GetSize(); i++) // recorro todos los nodos
+    {
+        Node<T>* inicio = _nodes.GetAt(i); // agarro el nodo de esta posicion
+
+        if (inicio->GetVisited()) // si ya lo visite
+        {
+            continue; // me brinco al siguiente
+        }
+
+        inicio->SetVisited(true); // lo marco como visitado
+        cola.Enqueue(inicio); // lo meto a la cola
+
+        while (!cola.IsEmpty()) // mientras haya algo en la cola
+        {
+            Node<T>* actual = cola.Dequeue(); // saco el primero
+            resultado.Add(actual->GetValue()); // agrego su valor al resultado
+
+            for (int j = 0; j < actual->GetNeighborCount(); j++) // reviso sus vecinos
+            {
+                Edge<T>* e = actual->GetNeighbor(j); // agarro la arista
+
+                Node<T>* vecino = e->GetFrom(); // supongo que el vecino es el origen
+                if (vecino == actual) // si el origen soy yo
+                {
+                    vecino = e->GetTo(); // entonces el vecino es el destino
+                }
+
+                if (vecino != nullptr && !vecino->GetVisited()) // si existe y no lo visite
+                {
+                    vecino->SetVisited(true); // lo marco de una vez
+                    cola.Enqueue(vecino); // lo meto a la cola para revisarlo luego
+                }
+            }
+        }
+    }
 }
 
 template <class T>
 void Graph<T>::Print()
 {
-    // TODO: imprimir cada nodo y a quienes esta conectado, usando
-    // ConsoleUI.
+    ConsoleUI::PrintTitle("GRAFO"); // pongo el titulo
+
+    for (int i = 0; i < _nodes.GetSize(); i++) // recorro todos los nodos
+    {
+        Node<T>* n = _nodes.GetAt(i); // agarro el nodo
+        std::cout << n->GetValue() << " -> "; // imprimo su valor
+
+        for (int j = 0; j < n->GetNeighborCount(); j++) // recorro sus vecinos
+        {
+            Edge<T>* e = n->GetNeighbor(j); // agarro la arista
+            Node<T>* otro = e->GetFrom(); // supongo que el otro es el origen
+            if (otro == n) // si soy yo
+            {
+                otro = e->GetTo(); // el otro es el destino
+            }
+            std::cout << otro->GetValue() << " "; // imprimo el valor del vecino
+        }
+        std::cout << std::endl; // salto de linea para el siguiente nodo
+    }
 }

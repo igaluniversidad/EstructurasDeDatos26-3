@@ -164,54 +164,82 @@ void AVLTree<T>::ActualizarAltura(Node* n)
 template <class T>
 typename AVLTree<T>::Node* AVLTree<T>::RotarDerecha(Node* n)
 {
-    // TODO: el hijo izquierdo de n sube a ocupar su lugar, y n baja a
-    // ser su hijo derecho. El subarbol que estorba se reacomoda.
-    //
-    // CUIDADO CON EL ORDEN DE LAS ALTURAS: primero actualiza la del nodo
-    // que BAJO, despues la del que SUBIO. Si lo haces al reves, las
-    // alturas quedan mal y el arbol se desbalancea sin que te des
-    // cuenta. Este es EL error mas comun del AVL.
-    //
-    // Regresa el nodo que quedo arriba.
-    return n;
+    //      n                izq
+    //     / \              /   \
+    //   izq   C    -->    A     n
+    //   / \                    / \
+    //  A   B                  B   C
+    // El hijo izquierdo sube, n baja a ser hijo derecho.
+    // El subarbol B (el que estorbaba) pasa a ser hijo izquierdo de n.
+    Node* izq = n->left;
+    Node* subB = izq->right;
+
+    izq->right = n;
+    n->left = subB;
+
+    // Orden correcto: primero el que BAJO (n), despues el que SUBIO (izq).
+    ActualizarAltura(n);
+    ActualizarAltura(izq);
+
+    return izq;
 }
 
 template <class T>
 typename AVLTree<T>::Node* AVLTree<T>::RotarIzquierda(Node* n)
 {
-    // TODO: el espejo exacto de RotarDerecha.
-    return n;
+    // Espejo de RotarDerecha:
+    //      n                  der
+    //     / \                /   \
+    //    C   der    -->     n     A
+    //       / \            / \
+    //      B   A          C   B
+    Node* der = n->right;
+    Node* subB = der->left;
+
+    der->left = n;
+    n->right = subB;
+
+    ActualizarAltura(n);
+    ActualizarAltura(der);
+
+    return der;
 }
 
 template <class T>
 typename AVLTree<T>::Node* AVLTree<T>::Balancear(Node* n)
 {
-    // TODO: actualiza la altura de n, calcula su factor de balance, y
-    // si esta desbalanceado aplica la correccion que corresponda.
-    //
-    // Hay CUATRO casos, pero solo DOS rotaciones. Los otros dos casos
-    // son combinaciones:
-    //
-    //   IZQUIERDA-IZQUIERDA (LL): n cargado a la izquierda, y su hijo
-    //       izquierdo TAMBIEN cargado a la izquierda.
-    //       -> una sola rotacion.
-    //
-    //   DERECHA-DERECHA (RR): el espejo del anterior.
-    //       -> una sola rotacion, en el otro sentido.
-    //
-    //   IZQUIERDA-DERECHA (LR): n cargado a la izquierda, pero su hijo
-    //       izquierdo cargado a la DERECHA. Una sola rotacion no lo
-    //       arregla: lo deja desbalanceado del otro lado.
-    //       -> DOS rotaciones.
-    //
-    //   DERECHA-IZQUIERDA (RL): el espejo del anterior.
-    //       -> DOS rotaciones.
-    //
-    // Para distinguirlos necesitas el factor de balance de n Y el de su
-    // hijo del lado cargado.
-    //
-    // Regresa el nodo que quedo arriba (si no hubo rotacion, es el mismo
-    // que entro).
+    if (n == nullptr) return nullptr;
+
+    ActualizarAltura(n);
+    int factor = FactorBalance(n);
+
+    // Cargado a la IZQUIERDA (factor 2)
+    if (factor > 1)
+    {
+        // LL: hijo izquierdo cargado a la izquierda (o parejo) -> una rotacion.
+        if (FactorBalance(n->left) >= 0)
+        {
+            return RotarDerecha(n);
+        }
+        // LR: hijo izquierdo cargado a la derecha -> dos rotaciones.
+        n->left = RotarIzquierda(n->left);
+        return RotarDerecha(n);
+    }
+
+    // Cargado a la DERECHA (factor -2)
+    if (factor < -1)
+    {
+        // RR: hijo derecho cargado a la derecha (o parejo) -> una rotacion.
+        if (FactorBalance(n->right) <= 0)
+        {
+            return RotarIzquierda(n);
+        }
+        // RL: hijo derecho cargado a la izquierda -> dos rotaciones.
+        n->right = RotarDerecha(n->right);
+        return RotarIzquierda(n);
+    }
+
+    // Balanceado: queda el mismo.
     return n;
 }
 

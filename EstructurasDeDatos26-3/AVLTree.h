@@ -97,14 +97,19 @@ AVLTree<T>::AVLTree()
 template <class T>
 AVLTree<T>::~AVLTree()
 {
-    // TODO: llamar a DestruirRec desde la raiz
+    DestruirRec(_root);
+    _root = nullptr;
+    _size = 0;
 }
 
 template <class T>
 void AVLTree<T>::DestruirRec(Node* n)
 {
-    // TODO: destruir primero los hijos y HASTA EL FINAL el nodo actual.
-    // Igual que en tu Tree: ese orden es el post-orden.
+    // Post-orden: primero los hijos, al final el nodo actual.
+    if (n == nullptr) return;
+    DestruirRec(n->left);
+    DestruirRec(n->right);
+    delete n;
 }
 
 
@@ -117,28 +122,29 @@ void AVLTree<T>::DestruirRec(Node* n)
 template <class T>
 int AVLTree<T>::Altura(Node* n)
 {
-    // TODO: regresar la altura GUARDADA en el nodo, o 0 si es nulo.
-    //
-    // Fijate que NO la recalcula recorriendo el arbol: la lee del campo
-    // height. Por eso es O(1), y por eso es tan importante mantener ese
-    // campo actualizado.
-    return 0;
+    // O(1): lee el campo guardado, no recorre el arbol.
+    // Convencion: nulo = 0, hoja = 1.
+    if (n == nullptr) return 0;
+    return n->height;
 }
 
 template <class T>
 int AVLTree<T>::FactorBalance(Node* n)
 {
-    // TODO: altura(izquierda) - altura(derecha). Un nodo nulo da 0.
-    //
-    // Positivo = cargado a la izquierda.
-    // Negativo = cargado a la derecha.
-    return 0;
+    // altura(izquierda) - altura(derecha). Nulo = 0 (balanceado).
+    // Positivo = cargado a la izquierda, negativo = a la derecha.
+    if (n == nullptr) return 0;
+    return Altura(n->left) - Altura(n->right);
 }
 
 template <class T>
 void AVLTree<T>::ActualizarAltura(Node* n)
 {
-    // TODO: la altura de n es 1 mas que la del MAS ALTO de sus dos hijos.
+    // La altura de n es 1 mas que la del mas alto de sus hijos.
+    if (n == nullptr) return;
+    int alturaIzq = Altura(n->left);
+    int alturaDer = Altura(n->right);
+    n->height = 1 + (alturaIzq > alturaDer ? alturaIzq : alturaDer);
 }
 
 

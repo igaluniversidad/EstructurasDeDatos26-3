@@ -58,37 +58,31 @@ Edge<T>::Edge()
 template <class T>
 Edge<T>::Edge(Node<T>* from, Node<T>* to)
 {
-    // TODO: guardar 'from' en _from y 'to' en _to, y _visited en false.
-    //
-    // Suena obvio, pero invertirlos es un error clasico. Y lo peor es
-    // que en un grafo NO dirigido el error se ESCONDE: como los
-    // recorridos revisan los dos extremos de todas formas, el programa
-    // sigue funcionando. Hay una prueba dedicada a cazar esto.
+    _from = from; // guardo el nodo de donde sale
+    _to = to; // guardo el nodo a donde llega
+    _visited = false; // al inicio nadie la ha visitado
 }
 
 template <class T>
 Node<T>* Edge<T>::GetFrom()
 {
-    // TODO
-    return nullptr;
+    return _from; // regreso el nodo origen
 }
 
 template <class T>
 Node<T>* Edge<T>::GetTo()
 {
-    // TODO
-    return nullptr;
+    return _to; // regreso el nodo destino
 }
 
 template <class T>
 void Edge<T>::SetVisited(bool visitado)
 {
-    // TODO
+    _visited = visitado; // marco si ya se visito o no
 }
 
 template <class T>
 bool Edge<T>::GetVisited()
 {
-    // TODO
-    return false;
+    return _visited; // digo si ya se visito
 }
